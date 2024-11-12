@@ -1,4 +1,4 @@
-(import <nixpkgs> {
+(import ((import ./npins).nixpkgs) {
   config = {
     allowUnfree = true;
     android_sdk.accept_license = true;
@@ -11,6 +11,7 @@
 , androidenv
 , buildFHSEnv
 , strace
+, npins
 }:
 
 let
@@ -37,6 +38,7 @@ mkShell {
     sdk
     gradle
     fhsEnv
+    npins
   ];
 
   ANDROID_HOME = "${sdk}/libexec/android-sdk";
