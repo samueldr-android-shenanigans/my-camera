@@ -56,10 +56,10 @@ public class MyWidgetProvider extends AppWidgetProvider {
             RemoteViews remote_views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
             remote_views.setOnClickPendingIntent(R.id.widget_launch_open_camera, pendingIntent);
             /*if( sharedPreferences.getBoolean(MainActivity.getShowWhenLockedPreferenceKey(), true) ) {
-                remote_views.setTextViewText(R.id.launch_open_camera, "Open Camera (unlocked)");
+                remote_views.setTextViewText(R.id.launch_open_camera, "“My” Camera (unlocked)");
             }
             else {
-                remote_views.setTextViewText(R.id.launch_open_camera, "Open Camera (locked)");
+                remote_views.setTextViewText(R.id.launch_open_camera, "“My” Camera (locked)");
             }*/
 
             appWidgetManager.updateAppWidget(appWidgetId, remote_views);

@@ -1091,7 +1091,7 @@ public class StorageUtils {
                     // path may be null on Android 4.4!: http://stackoverflow.com/questions/3401579/get-filename-and-path-from-uri-from-mediastore
                     if( save_folder_string == null || (path != null && path.contains(save_folder_string) ) ) {
                         if( MyDebug.LOG )
-                            Log.d(TAG, "found most recent in Open Camera folder");
+                            Log.d(TAG, "found most recent in “My” Camera folder");
                         // we filter files with dates in future, in case there exists an image in the folder with incorrect datestamp set to the future
                         // we allow up to 2 days in future, to avoid risk of issues to do with timezone etc
                         long date = cursor.getLong(column_date_taken_c);
@@ -1110,7 +1110,7 @@ public class StorageUtils {
 
                 if( !found ) {
                     if( MyDebug.LOG )
-                        Log.d(TAG, "can't find suitable in Open Camera folder, so just go with most recent");
+                        Log.d(TAG, "can't find suitable in “My” Camera folder, so just go with most recent");
                     cursor.moveToFirst();
                 }
                 */

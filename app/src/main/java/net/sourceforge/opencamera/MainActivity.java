@@ -739,7 +739,7 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
         // create notification channel - only needed on Android 8+
         // update: notifications now removed due to needing permissions on Android 13+
         /*if( Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ) {
-            CharSequence name = "Open Camera Image Saving";
+            CharSequence name = "“My” Camera Image Saving";
             String description = "Notification channel for processing and saving images in the background";
             int importance = NotificationManager.IMPORTANCE_LOW;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
@@ -939,28 +939,28 @@ public class MainActivity extends AppCompatActivity implements PreferenceFragmen
         }
         else if( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && MyTileService.TILE_ID.equals(action)) || ACTION_SHORTCUT_CAMERA.equals(action) ) {
             if( MyDebug.LOG )
-                Log.d(TAG, "launching from quick settings tile or application shortcut for Open Camera: photo mode");
+                Log.d(TAG, "launching from quick settings tile or application shortcut for “My” Camera: photo mode");
             applicationInterface.setVideoPref(false);
         }
         else if( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && MyTileServiceVideo.TILE_ID.equals(action)) || ACTION_SHORTCUT_VIDEO.equals(action) ) {
             if( MyDebug.LOG )
-                Log.d(TAG, "launching from quick settings tile or application shortcut for Open Camera: video mode");
+                Log.d(TAG, "launching from quick settings tile or application shortcut for “My” Camera: video mode");
             applicationInterface.setVideoPref(true);
         }
         else if( (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && MyTileServiceFrontCamera.TILE_ID.equals(action)) || ACTION_SHORTCUT_SELFIE.equals(action) ) {
             if( MyDebug.LOG )
-                Log.d(TAG, "launching from quick settings tile or application shortcut for Open Camera: selfie mode");
+                Log.d(TAG, "launching from quick settings tile or application shortcut for “My” Camera: selfie mode");
             done_facing = true;
             applicationInterface.switchToCamera(true);
         }
         else if( ACTION_SHORTCUT_GALLERY.equals(action) ) {
             if( MyDebug.LOG )
-                Log.d(TAG, "launching from application shortcut for Open Camera: gallery");
+                Log.d(TAG, "launching from application shortcut for “My” Camera: gallery");
             openGallery();
         }
         else if( ACTION_SHORTCUT_SETTINGS.equals(action) ) {
             if( MyDebug.LOG )
-                Log.d(TAG, "launching from application shortcut for Open Camera: settings");
+                Log.d(TAG, "launching from application shortcut for “My” Camera: settings");
             openSettings();
         }
 

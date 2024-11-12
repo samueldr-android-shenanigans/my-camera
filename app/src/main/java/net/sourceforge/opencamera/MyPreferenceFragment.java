@@ -402,7 +402,7 @@ public class MyPreferenceFragment extends PreferenceFragment implements OnShared
                                 Log.d(TAG, "NameNotFoundException exception trying to get version number");
                             e.printStackTrace();
                         }
-                        about_string.append("Open Camera v");
+                        about_string.append("“My” Camera v");
                         about_string.append(version);
                         about_string.append("\nCode: ");
                         about_string.append(version_code);
