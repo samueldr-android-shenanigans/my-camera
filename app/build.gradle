@@ -41,6 +41,20 @@ android {
         renderScript true
     }
     //useLibrary 'android.test.mock'
+
+    // lol...
+    // since I can't ascertain that the debug keystore is stable...
+    // ... ah, right, per-machine and in `$HOME/.config/.android/debug.keystore`... NOT in `$HOME/.android/debug.keystore`...
+    // TODO: https://stackoverflow.com/questions/28512684/android-studio-does-not-sign-the-code-for-debug-build
+    // See also: https://nimblehq.co/compass/development/android/project-configurations/#gradle-configuration
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+        debug {
+            signingConfig signingConfigs.debug
+        }
+    }
 }
 
 dependencies {
