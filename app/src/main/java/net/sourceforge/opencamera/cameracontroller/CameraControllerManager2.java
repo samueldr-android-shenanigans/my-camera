@@ -13,12 +13,24 @@ import android.os.Build;
 import android.util.Log;
 import android.util.SizeF;
 
+// For multi-cam hack
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import android.graphics.ImageFormat;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.params.StreamConfigurationMap;
+
 /** Provides support using Android 5's Camera 2 API
  *  android.hardware.camera2.*.
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class CameraControllerManager2 extends CameraControllerManager {
     private static final String TAG = "CControllerManager2";
+
+    private static int FORCED_CAMERA_MAX = 200;
+    static private List<String> all_cameras;
 
     private final Context context;
 
@@ -30,7 +42,7 @@ public class CameraControllerManager2 extends CameraControllerManager {
     public int getNumberOfCameras() {
         CameraManager manager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);
         try {
-            return manager.getCameraIdList().length;
+            return this.findCameraIds(manager).length;
         }
         catch(Throwable e) {
             // in theory we should only get CameraAccessException, but Google Play shows we can get a variety of exceptions
@@ -48,7 +60,7 @@ public class CameraControllerManager2 extends CameraControllerManager {
     public CameraController.Facing getFacing(int cameraId) {
         CameraManager manager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);
         try {
-            String cameraIdS = manager.getCameraIdList()[cameraId];
+            String cameraIdS = this.findCameraIds(manager)[cameraId];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraIdS);
             switch( characteristics.get(CameraCharacteristics.LENS_FACING) ) {
                 case CameraMetadata.LENS_FACING_FRONT:
@@ -77,7 +89,7 @@ public class CameraControllerManager2 extends CameraControllerManager {
         CameraManager manager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);
         String description = null;
         try {
-            String cameraIdS = manager.getCameraIdList()[cameraId];
+            String cameraIdS = this.findCameraIds(manager)[cameraId];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraIdS);
 
             switch( characteristics.get(CameraCharacteristics.LENS_FACING) ) {
@@ -197,7 +209,7 @@ public class CameraControllerManager2 extends CameraControllerManager {
     public boolean allowCamera2Support(int cameraId) {
         CameraManager manager = (CameraManager)context.getSystemService(Context.CAMERA_SERVICE);
         try {
-            String cameraIdS = manager.getCameraIdList()[cameraId];
+            String cameraIdS = this.findCameraIds(manager)[cameraId];
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraIdS);
             //return isHardwareLevelSupported(characteristics, CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY);
             return isHardwareLevelSupported(characteristics, CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LIMITED);
@@ -212,5 +224,79 @@ public class CameraControllerManager2 extends CameraControllerManager {
             e.printStackTrace();
         }
         return false;
+    }
+
+    static public String[] findCameraIds(CameraManager manager) throws CameraAccessException {
+        // FIXME: gate behind an option I guess?
+        //return manager.getCameraIdList();
+        all_cameras = new ArrayList<>();
+        if (all_cameras.size() == 0) {
+            _findCameraIds(manager, all_cameras);
+        }
+        return all_cameras.toArray(new String[0]);
+    }
+    // FROM: ../FreeDcam/app/src/main/java/freed/cam/apis/featuredetector/Camera2FeatureDetectorTask.java
+    static private void _findCameraIds(CameraManager manager, List<String> cameraids) {
+        List<String> allcameraids = new ArrayList<>();
+        List<String> nonlogicids = new ArrayList<>();
+        String[] reportedids = null;
+        try {
+            reportedids = manager.getCameraIdList();
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < FORCED_CAMERA_MAX; i++)
+        {
+            try {
+                CameraCharacteristics characteristics = manager.getCameraCharacteristics(String.valueOf(i));
+
+                if (characteristics != null) {
+                    boolean raw = false;
+                    boolean yuv = false;
+                    boolean jpeg = false;
+                    boolean logical = false;
+                    allcameraids.add(String.valueOf(i));
+                    StreamConfigurationMap smap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                    int[] outputformats =  smap.getOutputFormats();
+                    for(int outformat : outputformats)
+                    {
+                        switch (outformat)
+                        {
+                            case ImageFormat.RAW_SENSOR:
+                            case ImageFormat.RAW10:
+                            case ImageFormat.RAW12:
+                                raw = true;
+                                break;
+                            case ImageFormat.JPEG:
+                                jpeg =true;
+                                break;
+                            case ImageFormat.YUV_420_888:
+                                yuv = true;
+                                break;
+                        }
+                    }
+                    if (yuv && raw && jpeg && !logical)
+                        nonlogicids.add(String.valueOf(i));
+                }
+            }
+            catch (IllegalArgumentException ex)
+            {
+            }
+            catch (CameraAccessException ex)
+            {
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+        if (nonlogicids.size() >= reportedids.length || allcameraids.size() >= reportedids.length) {
+            if (nonlogicids.size() == 0)
+                cameraids.addAll(allcameraids);
+            else
+                cameraids.addAll(nonlogicids);
+        }
+        else
+            cameraids.addAll(Arrays.asList(reportedids));
+
     }
 }
